@@ -1,0 +1,641 @@
+const express = require('express');
+const app = express();
+app.use(express.json({ limit: '10mb' }));
+
+app.post('/generate', async (req, res) => {
+  try {
+    const data = req.body;
+    let html = getTemplate();
+
+    // 기본 정보
+    html = html.replace(/{{BIRTH_DATE}}/g, data.birth_date || '');
+    html = html.replace(/{{BIRTH_TIME}}/g, data.birth_time || '');
+    html = html.replace(/{{BIRTH_PLACE}}/g, data.birth_place || '');
+    html = html.replace(/{{GENDER}}/g, data.gender || '');
+    html = html.replace(/{{ILJU}}/g, data.ilju || '');
+    html = html.replace(/{{YONGSIN}}/g, data.yongsin || '');
+
+    // 사주팔자
+    html = html.replace(/{{HOUR_H}}/g, data.hour_h || '');
+    html = html.replace(/{{HOUR_H_ELEMENT}}/g, data.hour_h_element || '');
+    html = html.replace(/{{HOUR_H_CLASS}}/g, data.hour_h_class || '');
+    html = html.replace(/{{DAY_H}}/g, data.day_h || '');
+    html = html.replace(/{{DAY_H_ELEMENT}}/g, data.day_h_element || '');
+    html = html.replace(/{{DAY_H_CLASS}}/g, data.day_h_class || '');
+    html = html.replace(/{{MONTH_H}}/g, data.month_h || '');
+    html = html.replace(/{{MONTH_H_ELEMENT}}/g, data.month_h_element || '');
+    html = html.replace(/{{MONTH_H_CLASS}}/g, data.month_h_class || '');
+    html = html.replace(/{{YEAR_H}}/g, data.year_h || '');
+    html = html.replace(/{{YEAR_H_ELEMENT}}/g, data.year_h_element || '');
+    html = html.replace(/{{YEAR_H_CLASS}}/g, data.year_h_class || '');
+
+    html = html.replace(/{{HOUR_E}}/g, data.hour_e || '');
+    html = html.replace(/{{HOUR_E_ELEMENT}}/g, data.hour_e_element || '');
+    html = html.replace(/{{HOUR_E_CLASS}}/g, data.hour_e_class || '');
+    html = html.replace(/{{DAY_E}}/g, data.day_e || '');
+    html = html.replace(/{{DAY_E_ELEMENT}}/g, data.day_e_element || '');
+    html = html.replace(/{{DAY_E_CLASS}}/g, data.day_e_class || '');
+    html = html.replace(/{{MONTH_E}}/g, data.month_e || '');
+    html = html.replace(/{{MONTH_E_ELEMENT}}/g, data.month_e_element || '');
+    html = html.replace(/{{MONTH_E_CLASS}}/g, data.month_e_class || '');
+    html = html.replace(/{{YEAR_E}}/g, data.year_e || '');
+    html = html.replace(/{{YEAR_E_ELEMENT}}/g, data.year_e_element || '');
+    html = html.replace(/{{YEAR_E_CLASS}}/g, data.year_e_class || '');
+
+    // 오행
+    html = html.replace(/{{WOOD_RATIO}}/g, data.wood_ratio || '0');
+    html = html.replace(/{{WOOD_COUNT}}/g, data.wood_count || '0');
+    html = html.replace(/{{FIRE_RATIO}}/g, data.fire_ratio || '0');
+    html = html.replace(/{{FIRE_COUNT}}/g, data.fire_count || '0');
+    html = html.replace(/{{EARTH_RATIO}}/g, data.earth_ratio || '0');
+    html = html.replace(/{{EARTH_COUNT}}/g, data.earth_count || '0');
+    html = html.replace(/{{METAL_RATIO}}/g, data.metal_ratio || '0');
+    html = html.replace(/{{METAL_COUNT}}/g, data.metal_count || '0');
+    html = html.replace(/{{WATER_RATIO}}/g, data.water_ratio || '0');
+    html = html.replace(/{{WATER_COUNT}}/g, data.water_count || '0');
+
+    // 본질
+    html = html.replace(/{{ESSENCE_HEADLINE}}/g, (data.essence_headline || '').replace(/\n/g, '<br>'));
+    html = html.replace(/{{ESSENCE_1}}/g, data.essence_1 || '');
+    html = html.replace(/{{ESSENCE_2}}/g, data.essence_2 || '');
+    html = html.replace(/{{ESSENCE_3}}/g, data.essence_3 || '');
+
+    // 키워드
+    html = html.replace(/{{KEYWORD_1}}/g, data.keyword_1 || '');
+    html = html.replace(/{{KEYWORD_2}}/g, data.keyword_2 || '');
+    html = html.replace(/{{KEYWORD_3}}/g, data.keyword_3 || '');
+    html = html.replace(/{{KEYWORD_4}}/g, data.keyword_4 || '');
+    html = html.replace(/{{KEYWORD_5}}/g, data.keyword_5 || '');
+    html = html.replace(/{{KEYWORD_6}}/g, data.keyword_6 || '');
+
+    // 성격
+    html = html.replace(/{{PERSONALITY_1}}/g, data.personality_1 || '');
+    html = html.replace(/{{PERSONALITY_2}}/g, data.personality_2 || '');
+    html = html.replace(/{{PERSONALITY_3}}/g, data.personality_3 || '');
+    html = html.replace(/{{PERSONALITY_4}}/g, data.personality_4 || '');
+    html = html.replace(/{{PERSONALITY_SUMMARY}}/g, data.personality_summary || '');
+
+    // 재능
+    html = html.replace(/{{TALENT_1}}/g, data.talent_1 || '');
+    html = html.replace(/{{TALENT_2}}/g, data.talent_2 || '');
+    html = html.replace(/{{TALENT_3}}/g, data.talent_3 || '');
+    html = html.replace(/{{TALENT_4}}/g, data.talent_4 || '');
+    html = html.replace(/{{TALENT_SUMMARY}}/g, data.talent_summary || '');
+
+    // 과제
+    html = html.replace(/{{CAUTION_1}}/g, data.caution_1 || '');
+    html = html.replace(/{{CAUTION_2}}/g, data.caution_2 || '');
+    html = html.replace(/{{CAUTION_3}}/g, data.caution_3 || '');
+    html = html.replace(/{{CAUTION_4}}/g, data.caution_4 || '');
+    html = html.replace(/{{CAUTION_SUMMARY}}/g, data.caution_summary || '');
+
+    // 지금
+    html = html.replace(/{{NOW_1}}/g, data.now_1 || '');
+    html = html.replace(/{{NOW_2}}/g, data.now_2 || '');
+    html = html.replace(/{{NOW_3}}/g, data.now_3 || '');
+    html = html.replace(/{{NOW_4}}/g, data.now_4 || '');
+    html = html.replace(/{{NOW_SUMMARY}}/g, data.now_summary || '');
+
+    // 직업
+    html = html.replace(/{{WORK_JOBS}}/g, data.work_jobs || '');
+    html = html.replace(/{{WORK_MONEY}}/g, data.work_money || '');
+    html = html.replace(/{{WORK_CAUTION}}/g, data.work_caution || '');
+    html = html.replace(/{{WORK_GROWTH}}/g, data.work_growth || '');
+    html = html.replace(/{{WORK_SUMMARY}}/g, data.work_summary || '');
+
+    // 연애
+    html = html.replace(/{{LOVE_1}}/g, data.love_1 || '');
+    html = html.replace(/{{LOVE_2}}/g, data.love_2 || '');
+    html = html.replace(/{{LOVE_3}}/g, data.love_3 || '');
+    html = html.replace(/{{LOVE_4}}/g, data.love_4 || '');
+    html = html.replace(/{{LOVE_5}}/g, data.love_5 || '');
+    html = html.replace(/{{LOVE_SUMMARY}}/g, data.love_summary || '');
+
+    // 대운
+    html = html.replace(/{{DW1_AGE}}/g, data.dw1_age || '');
+    html = html.replace(/{{DW1_NAME}}/g, data.dw1_name || '');
+    html = html.replace(/{{DW1_PHASE}}/g, data.dw1_phase || '');
+    html = html.replace(/{{DW2_AGE}}/g, data.dw2_age || '');
+    html = html.replace(/{{DW2_NAME}}/g, data.dw2_name || '');
+    html = html.replace(/{{DW2_PHASE}}/g, data.dw2_phase || '');
+    html = html.replace(/{{DW3_AGE}}/g, data.dw3_age || '');
+    html = html.replace(/{{DW3_NAME}}/g, data.dw3_name || '');
+    html = html.replace(/{{DW4_AGE}}/g, data.dw4_age || '');
+    html = html.replace(/{{DW4_NAME}}/g, data.dw4_name || '');
+    html = html.replace(/{{DW4_PHASE}}/g, data.dw4_phase || '');
+    html = html.replace(/{{DW5_AGE}}/g, data.dw5_age || '');
+    html = html.replace(/{{DW5_NAME}}/g, data.dw5_name || '');
+    html = html.replace(/{{DW5_PHASE}}/g, data.dw5_phase || '');
+    html = html.replace(/{{DAEWOON_SUMMARY}}/g, data.daewoon_summary || '');
+
+    // 메시지
+    html = html.replace(/{{MESSAGE}}/g, (data.message || '').replace(/\n/g, '<br>'));
+
+    res.send(html);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/', (req, res) => {
+  res.send('사주 리포트 서버 작동 중 ✅');
+});
+
+function getTemplate() {
+  // 여기에 saju-template-placeholders.html 전체 내용 붙여넣기
+  return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사주 리포트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070a16;
+    --card: rgba(255,255,255,0.03);
+    --card-hover: rgba(255,255,255,0.05);
+    --border: rgba(180,150,80,0.22);
+    --border-bright: rgba(201,168,76,0.5);
+    --gold: #c9a84c;
+    --gold2: #f0d485;
+    --gold3: rgba(201,168,76,0.1);
+    --gold-glow: rgba(201,168,76,0.15);
+    --text: #ede5d5;
+    --muted: rgba(237,229,213,0.5);
+    --wood: #72b072;
+    --fire: #d4724e;
+    --earth: #c4a030;
+    --metal: #90b8d0;
+    --water: #4a72b0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    width: 794px;
+    margin: 0 auto;
+  }
+
+  .page {
+    width: 794px;
+    min-height: 1123px;
+    padding: 52px 48px;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 8% 12%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 8%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(2px 2px at 48% 5%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 18%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 22% 28%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 63% 35%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 88% 42%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 50%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(2px 2px at 12% 60%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 65%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 72%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 28% 80%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 88%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 42% 92%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 95% 95%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(2.5px 2.5px at 30% 15%, rgba(240,212,133,0.5) 0%, transparent 100%),
+      radial-gradient(2px 2px at 68% 60%, rgba(240,212,133,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 15% 45%, rgba(240,212,133,0.3) 0%, transparent 100%),
+      radial-gradient(2.5px 2.5px at 82% 30%, rgba(240,212,133,0.4) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.05) 0%, transparent 70%),
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(74,114,176,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse at center, transparent 40%, rgba(4,6,14,0.75) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .corner { position: absolute; width: 80px; height: 80px; pointer-events: none; z-index: 10; }
+  .corner-tl { top: 18px; left: 18px; }
+  .corner-tr { top: 18px; right: 18px; transform: scaleX(-1); }
+  .corner-bl { bottom: 18px; left: 18px; transform: scaleY(-1); }
+  .corner-br { bottom: 18px; right: 18px; transform: scale(-1); }
+  .corner svg { width: 100%; height: 100%; }
+
+  .content { position: relative; z-index: 1; }
+
+  .header { text-align: center; margin-bottom: 26px; }
+  .header-badge { display: inline-flex; align-items: center; gap: 10px; font-family: 'Cormorant Garamond', serif; font-size: 10.5px; letter-spacing: 5px; color: var(--gold); text-transform: uppercase; margin-bottom: 12px; opacity: 0.9; }
+  .badge-gem { width: 5px; height: 5px; background: var(--gold2); transform: rotate(45deg); box-shadow: 0 0 6px var(--gold); flex-shrink: 0; }
+  .page-num { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-family: 'Cormorant Garamond', serif; font-size: 10px; color: var(--gold); opacity: 0.55; letter-spacing: 3px; border: 1px solid var(--border); padding: 2px 8px; border-radius: 10px; }
+  .main-title { font-family: 'Noto Serif KR', serif; font-size: 27px; font-weight: 900; color: var(--gold2); line-height: 1.2; text-shadow: 0 0 30px rgba(240,212,133,0.4), 0 0 80px rgba(201,168,76,0.2); margin-bottom: 7px; }
+  .sub-title { font-size: 11.5px; color: var(--muted); letter-spacing: 1.5px; font-weight: 300; }
+  .header-line { display: flex; align-items: center; gap: 12px; margin-top: 16px; justify-content: center; }
+  .header-line-bar { flex: 1; max-width: 130px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+  .header-line-bar:last-child { background: linear-gradient(90deg, var(--gold), transparent); }
+  .header-line-center { display: flex; align-items: center; gap: 6px; color: var(--gold); }
+  .header-line-center .gem { width: 4px; height: 4px; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 4px var(--gold); }
+  .header-icon { font-size: 15px; text-shadow: 0 0 10px var(--gold); }
+
+  .top-grid { display: grid; grid-template-columns: 200px 1fr 200px; gap: 14px; margin-bottom: 14px; }
+
+  .card { background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid var(--border); border-radius: 10px; padding: 16px; position: relative; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.4); }
+  .card::before { content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 1px; background: linear-gradient(90deg, transparent, rgba(240,212,133,0.5), transparent); border-radius: 1px; }
+  .card::after { content: '◆'; position: absolute; top: -5px; right: 12px; font-size: 7px; color: var(--gold); opacity: 0.5; text-shadow: 0 0 4px var(--gold); }
+
+  .card-label { font-size: 8.5px; letter-spacing: 3.5px; color: var(--gold); text-transform: uppercase; font-family: 'Cormorant Garamond', serif; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+  .card-label::before { content: ''; width: 3px; height: 3px; background: var(--gold2); transform: rotate(45deg); box-shadow: 0 0 4px var(--gold); flex-shrink: 0; }
+  .card-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+  .info-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 11.5px; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .info-icon { color: var(--gold); font-size: 11px; width: 14px; text-align: center; opacity: 0.85; }
+  .info-label { color: var(--muted); font-size: 10px; min-width: 52px; letter-spacing: 0.3px; }
+  .info-value { font-weight: 500; font-size: 11.5px; }
+
+  .saju-center { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+  .saju-table { width: 100%; }
+  .saju-table-header { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 4px; }
+  .saju-col-label { text-align: center; font-size: 8.5px; color: var(--gold); opacity: 0.65; font-family: 'Cormorant Garamond', serif; letter-spacing: 1.5px; }
+  .saju-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 5px; }
+  .saju-cell { background: linear-gradient(160deg, rgba(201,168,76,0.07), rgba(201,168,76,0.03)); border: 1px solid var(--border); border-radius: 7px; text-align: center; padding: 8px 4px; position: relative; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+  .saju-cell::after { content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, rgba(240,212,133,0.3), transparent); }
+  .saju-cell.day { background: linear-gradient(160deg, rgba(201,168,76,0.2), rgba(201,168,76,0.08)); border-color: rgba(201,168,76,0.55); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 0 16px rgba(201,168,76,0.12); }
+  .saju-cell.day::after { background: linear-gradient(90deg, transparent, rgba(240,212,133,0.6), transparent); }
+  .saju-heavenly { font-family: 'Noto Serif KR', serif; font-size: 19px; font-weight: 700; color: var(--gold2); line-height: 1; margin-bottom: 3px; text-shadow: 0 0 12px rgba(240,212,133,0.3); }
+  .saju-earthly { font-family: 'Noto Serif KR', serif; font-size: 19px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+  .saju-element { font-size: 8.5px; letter-spacing: 0.3px; opacity: 0.8; }
+  .saju-row-label { font-size: 8.5px; color: var(--muted); text-align: center; margin-top: 1px; letter-spacing: 0.5px; }
+
+  .wood { color: var(--wood); }
+  .fire { color: var(--fire); }
+  .earth { color: var(--earth); }
+  .metal { color: var(--metal); }
+  .water { color: var(--water); }
+
+  .ohaeng-bar { display: flex; gap: 5px; width: 100%; margin-top: 4px; }
+  .ohaeng-item { flex: 1; text-align: center; }
+  .ohaeng-name { font-size: 10px; margin-bottom: 3px; font-family: 'Noto Serif KR', serif; font-weight: 600; }
+  .ohaeng-fill-wrap { height: 5px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+  .ohaeng-fill { height: 100%; border-radius: 3px; }
+  .ohaeng-count { font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+  .essence-headline { font-family: 'Noto Serif KR', serif; font-size: 19px; font-weight: 700; color: var(--gold2); line-height: 1.35; margin-bottom: 13px; text-shadow: 0 0 20px rgba(240,212,133,0.25); }
+  .essence-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 7px; font-size: 11px; color: var(--muted); line-height: 1.55; }
+  .essence-dot { color: var(--gold2); margin-top: 3px; font-size: 7px; flex-shrink: 0; text-shadow: 0 0 6px var(--gold); }
+  .yongsin-box { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(114,176,114,0.12), rgba(74,114,176,0.08)); border: 1px solid rgba(114,176,114,0.35); border-radius: 6px; padding: 5px 10px; font-size: 10.5px; color: #9fd49f; margin-top: 8px; }
+
+  .keyword-section { margin-bottom: 14px; }
+  .section-title { font-size: 9.5px; letter-spacing: 3.5px; color: var(--gold); text-transform: uppercase; font-family: 'Cormorant Garamond', serif; text-align: center; margin-bottom: 11px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .section-title::before, .section-title::after { content: ''; width: 55px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+  .section-title::after { background: linear-gradient(90deg, var(--gold), transparent); }
+  .keyword-tags { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; }
+  .keyword-tag { background: linear-gradient(135deg, rgba(201,168,76,0.14), rgba(201,168,76,0.06)); border: 1px solid rgba(201,168,76,0.32); border-radius: 20px; padding: 5px 15px; font-size: 11px; color: var(--gold2); font-family: 'Noto Serif KR', serif; font-weight: 600; letter-spacing: 0.5px; position: relative; }
+  .keyword-tag::before { content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, rgba(240,212,133,0.4), transparent); border-radius: 1px; }
+
+  .main-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .main-card-title { font-size: 9.5px; letter-spacing: 2px; color: var(--gold); font-family: 'Cormorant Garamond', serif; margin-bottom: 11px; display: flex; align-items: center; gap: 5px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .bullet-item { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 6px; font-size: 10.5px; color: var(--text); line-height: 1.45; }
+  .bullet-dot { color: var(--gold); font-size: 6px; margin-top: 5px; flex-shrink: 0; }
+  .card-footer-note { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 9.5px; color: var(--gold); font-style: italic; text-align: center; font-family: 'Cormorant Garamond', serif; letter-spacing: 0.5px; opacity: 0.85; }
+
+  .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .bottom-card-title { font-family: 'Noto Serif KR', serif; font-size: 13px; font-weight: 700; color: var(--gold2); margin-bottom: 12px; display: flex; align-items: center; gap: 7px; padding-bottom: 9px; border-bottom: 1px solid var(--border); }
+  .work-item { display: grid; grid-template-columns: 72px 1fr; gap: 6px; margin-bottom: 7px; font-size: 11px; align-items: flex-start; }
+  .work-item-label { color: var(--gold); opacity: 0.7; font-size: 9.5px; padding-top: 1px; }
+  .work-item-value { color: var(--text); line-height: 1.45; }
+
+  .daewoon-section { margin-bottom: 14px; }
+  .flow-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 11px; position: relative; }
+  .flow-grid::before { content: ''; position: absolute; top: 30px; left: 8%; right: 8%; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent); }
+  .flow-item { text-align: center; }
+  .flow-age { font-size: 10px; color: var(--gold); font-family: 'Cormorant Garamond', serif; letter-spacing: 0.5px; margin-bottom: 5px; opacity: 0.8; }
+  .flow-icon-wrap { padding: 8px 4px; border-radius: 8px; }
+  .flow-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+  .flow-name { font-size: 10px; color: var(--muted); margin-bottom: 3px; font-family: 'Noto Serif KR', serif; }
+  .flow-item.current .flow-icon-wrap { background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.06)); border: 1px solid rgba(201,168,76,0.45); box-shadow: 0 0 20px rgba(201,168,76,0.12), inset 0 1px 0 rgba(255,255,255,0.08); }
+  .flow-item.current .flow-age { color: var(--gold2); opacity: 1; font-weight: 600; }
+  .flow-item.current .flow-name { color: var(--gold2); }
+  .flow-badge { display: inline-block; background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.1)); border: 1px solid rgba(201,168,76,0.45); border-radius: 10px; font-size: 8.5px; color: var(--gold2); padding: 1px 7px; margin-top: 2px; }
+  .flow-desc { font-size: 10px; font-style: italic; font-family: 'Cormorant Garamond', serif; text-align: center; color: var(--muted); margin-top: 9px; letter-spacing: 0.8px; }
+
+  .message-card { background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.04)); border: 1px solid rgba(201,168,76,0.3); border-radius: 10px; padding: 18px 24px; text-align: center; position: relative; box-shadow: 0 0 40px rgba(201,168,76,0.06), inset 0 1px 0 rgba(255,255,255,0.07); }
+  .message-card::before { content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 1px; background: linear-gradient(90deg, transparent, rgba(240,212,133,0.6), transparent); }
+  .message-card::after { content: ''; position: absolute; bottom: 0; left: 15%; right: 15%; height: 1px; background: linear-gradient(90deg, transparent, rgba(240,212,133,0.3), transparent); }
+  .msg-ornament { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 11px; }
+  .msg-ornament-line { width: 40px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+  .msg-ornament-line:last-child { background: linear-gradient(90deg, var(--gold), transparent); }
+  .message-title { font-size: 8.5px; letter-spacing: 4px; color: var(--gold); font-family: 'Cormorant Garamond', serif; text-transform: uppercase; opacity: 0.9; }
+  .message-title-gem { width: 4px; height: 4px; background: var(--gold2); transform: rotate(45deg); box-shadow: 0 0 6px var(--gold); flex-shrink: 0; }
+  .message-text { font-family: 'Noto Serif KR', serif; font-size: 12.5px; color: var(--text); line-height: 1.85; }
+  .message-text strong { color: var(--gold2); font-weight: 700; }
+
+  .rose-deco { position: absolute; font-size: 44px; opacity: 0.045; pointer-events: none; z-index: 0; filter: sepia(60%) hue-rotate(300deg) saturate(60%); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="corner corner-tl"><svg viewBox="0 0 80 80" fill="none"><path d="M4 4 L4 36" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/><path d="M4 4 L36 4" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/><path d="M4 20 L16 20" stroke="#c9a84c" stroke-width="0.7" opacity="0.4"/><path d="M20 4 L20 16" stroke="#c9a84c" stroke-width="0.7" opacity="0.4"/><rect x="2" y="2" width="4" height="4" fill="#f0d485" opacity="0.6" transform="rotate(45 4 4)"/><circle cx="4" cy="36" r="1.5" fill="#c9a84c" opacity="0.5"/><circle cx="36" cy="4" r="1.5" fill="#c9a84c" opacity="0.5"/></svg></div>
+  <div class="corner corner-tr"><svg viewBox="0 0 80 80" fill="none"><path d="M4 4 L4 36" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/><path d="M4 4 L36 4" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/><path d="M4 20 L16 20" stroke="#c9a84c" stroke-width="0.7" opacity="0.4"/><path d="M20 4 L20 16" stroke="#c9a84c" stroke-width="0.7" opacity="0.4"/><rect x="2" y="2" width="4" height="4" fill="#f0d485" opacity="0.6" transform="rotate(45 4 4)"/><circle cx="4" cy="36" r="1.5" fill="#c9a84c" opacity="0.5"/><circle cx="36" cy="4" r="1.5" fill="#c9a84c" opacity="0.5"/></svg></div>
+  <div class="corner corner-bl"><svg viewBox="0 0 80 80" fill="none"><path d="M4 4 L4 36" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/><path d="M4 4 L36 4" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/><path d="M4 20 L16 20" stroke="#c9a84c" stroke-width="0.7" opacity="0.4"/><path d="M20 4 L20 16" stroke="#c9a84c" stroke-width="0.7" opacity="0.4"/><rect x="2" y="2" width="4" height="4" fill="#f0d485" opacity="0.6" transform="rotate(45 4 4)"/><circle cx="4" cy="36" r="1.5" fill="#c9a84c" opacity="0.5"/><circle cx="36" cy="4" r="1.5" fill="#c9a84c" opacity="0.5"/></svg></div>
+  <div class="corner corner-br"><svg viewBox="0 0 80 80" fill="none"><path d="M4 4 L4 36" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/><path d="M4 4 L36 4" stroke="#c9a84c" stroke-width="1.5" opacity="0.7"/><path d="M4 20 L16 20" stroke="#c9a84c" stroke-width="0.7" opacity="0.4"/><path d="M20 4 L20 16" stroke="#c9a84c" stroke-width="0.7" opacity="0.4"/><rect x="2" y="2" width="4" height="4" fill="#f0d485" opacity="0.6" transform="rotate(45 4 4)"/><circle cx="4" cy="36" r="1.5" fill="#c9a84c" opacity="0.5"/><circle cx="36" cy="4" r="1.5" fill="#c9a84c" opacity="0.5"/></svg></div>
+
+  <div class="rose-deco" style="top:50px;right:28px;">🌹</div>
+  <div class="rose-deco" style="bottom:70px;left:18px;font-size:54px;">🌹</div>
+  <div class="rose-deco" style="top:45%;left:48%;font-size:200px;opacity:0.018;">☯</div>
+
+  <div class="content">
+
+    <div class="header">
+      <div style="position:relative;">
+        <div class="header-badge">
+          <div class="badge-gem"></div>
+          四柱命理 Personal Reading
+          <div class="badge-gem"></div>
+        </div>
+        <div class="page-num">1 · 3</div>
+      </div>
+      <div class="main-title">나의 사주 · 성격 · 운명 전체 지도</div>
+      <div class="sub-title">사주팔자로 읽는 타고난 본질과 인생의 흐름</div>
+      <div class="header-line">
+        <div class="header-line-bar"></div>
+        <div class="header-line-center"><div class="gem"></div><span class="header-icon">☯</span><div class="gem"></div></div>
+        <div class="header-line-bar"></div>
+      </div>
+    </div>
+
+    <div class="top-grid">
+
+      <!-- ✅ 기본 정보 카드 — 여기서 바뀌는 값들 -->
+      <div class="card">
+        <div class="card-label">기본 정보</div>
+        <div class="info-row">
+          <span class="info-icon">📅</span>
+          <span class="info-label">생년월일</span>
+          <span class="info-value">{{BIRTH_DATE}}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">🕐</span>
+          <span class="info-label">출생시간</span>
+          <span class="info-value">{{BIRTH_TIME}}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">📍</span>
+          <span class="info-label">출생지</span>
+          <span class="info-value">{{BIRTH_PLACE}}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">👤</span>
+          <span class="info-label">성별</span>
+          <span class="info-value">{{GENDER}}</span>
+        </div>
+        <div class="info-row" style="border:none;">
+          <span class="info-icon">💫</span>
+          <span class="info-label">일주</span>
+          <span class="info-value" style="color:var(--gold2);font-weight:700;">{{ILJU}}</span>
+        </div>
+        <div class="yongsin-box">
+          <span>🔥</span> {{YONGSIN}}
+        </div>
+      </div>
+
+      <!-- ✅ 사주팔자 표 — 천간·지지 8글자 전부 바뀜 -->
+      <div class="saju-center">
+        <div class="saju-table">
+          <div class="saju-table-header">
+            <div class="saju-col-label">시 (時)</div>
+            <div class="saju-col-label">일 (日) ★</div>
+            <div class="saju-col-label">월 (月)</div>
+            <div class="saju-col-label">년 (年)</div>
+          </div>
+          <!-- 천간 -->
+          <div class="saju-row">
+            <div class="saju-cell">
+              <div class="saju-heavenly {{HOUR_H_CLASS}}">{{HOUR_H}}</div>
+              <div class="saju-element {{HOUR_H_CLASS}}">{{HOUR_H_ELEMENT}}</div>
+            </div>
+            <div class="saju-cell day">
+              <div class="saju-heavenly {{DAY_H_CLASS}}">{{DAY_H}}</div>
+              <div class="saju-element {{DAY_H_CLASS}}">{{DAY_H_ELEMENT}}</div>
+            </div>
+            <div class="saju-cell">
+              <div class="saju-heavenly {{MONTH_H_CLASS}}">{{MONTH_H}}</div>
+              <div class="saju-element {{MONTH_H_CLASS}}">{{MONTH_H_ELEMENT}}</div>
+            </div>
+            <div class="saju-cell">
+              <div class="saju-heavenly {{YEAR_H_CLASS}}">{{YEAR_H}}</div>
+              <div class="saju-element {{YEAR_H_CLASS}}">{{YEAR_H_ELEMENT}}</div>
+            </div>
+          </div>
+          <div class="saju-row-label" style="margin-bottom:5px;">천간 (天干) · 하늘의 기운</div>
+          <!-- 지지 -->
+          <div class="saju-row">
+            <div class="saju-cell">
+              <div class="saju-earthly {{HOUR_E_CLASS}}" style="font-family:'Noto Serif KR',serif;font-size:19px;font-weight:700;line-height:1;margin-bottom:3px;">{{HOUR_E}}</div>
+              <div class="saju-element {{HOUR_E_CLASS}}">{{HOUR_E_ELEMENT}}</div>
+            </div>
+            <div class="saju-cell day">
+              <div class="saju-earthly {{DAY_E_CLASS}}" style="font-family:'Noto Serif KR',serif;font-size:19px;font-weight:700;line-height:1;margin-bottom:3px;">{{DAY_E}}</div>
+              <div class="saju-element {{DAY_E_CLASS}}">{{DAY_E_ELEMENT}}</div>
+            </div>
+            <div class="saju-cell">
+              <div class="saju-earthly {{MONTH_E_CLASS}}" style="font-family:'Noto Serif KR',serif;font-size:19px;font-weight:700;line-height:1;margin-bottom:3px;">{{MONTH_E}}</div>
+              <div class="saju-element {{MONTH_E_CLASS}}">{{MONTH_E_ELEMENT}}</div>
+            </div>
+            <div class="saju-cell">
+              <div class="saju-earthly {{YEAR_E_CLASS}}" style="font-family:'Noto Serif KR',serif;font-size:19px;font-weight:700;line-height:1;margin-bottom:3px;">{{YEAR_E}}</div>
+              <div class="saju-element {{YEAR_E_CLASS}}">{{YEAR_E_ELEMENT}}</div>
+            </div>
+          </div>
+          <div class="saju-row-label">지지 (地支) · 땅의 기운</div>
+
+          <!-- ✅ 오행 분포 바 -->
+          <div style="margin-top:11px;">
+            <div style="font-size:8.5px;color:var(--muted);text-align:center;margin-bottom:6px;letter-spacing:1.5px;">오행 분포 (五行)</div>
+            <div class="ohaeng-bar">
+              <div class="ohaeng-item">
+                <div class="ohaeng-name wood">木</div>
+                <div class="ohaeng-fill-wrap"><div class="ohaeng-fill" style="width:{{WOOD_RATIO}}%;background:var(--wood);"></div></div>
+                <div class="ohaeng-count">{{WOOD_COUNT}}</div>
+              </div>
+              <div class="ohaeng-item">
+                <div class="ohaeng-name fire">火</div>
+                <div class="ohaeng-fill-wrap"><div class="ohaeng-fill" style="width:{{FIRE_RATIO}}%;background:var(--fire);"></div></div>
+                <div class="ohaeng-count">{{FIRE_COUNT}}</div>
+              </div>
+              <div class="ohaeng-item">
+                <div class="ohaeng-name earth">土</div>
+                <div class="ohaeng-fill-wrap"><div class="ohaeng-fill" style="width:{{EARTH_RATIO}}%;background:var(--earth);"></div></div>
+                <div class="ohaeng-count">{{EARTH_COUNT}}</div>
+              </div>
+              <div class="ohaeng-item">
+                <div class="ohaeng-name metal">金</div>
+                <div class="ohaeng-fill-wrap"><div class="ohaeng-fill" style="width:{{METAL_RATIO}}%;background:var(--metal);"></div></div>
+                <div class="ohaeng-count">{{METAL_COUNT}}</div>
+              </div>
+              <div class="ohaeng-item">
+                <div class="ohaeng-name water">水</div>
+                <div class="ohaeng-fill-wrap"><div class="ohaeng-fill" style="width:{{WATER_RATIO}}%;background:var(--water);"></div></div>
+                <div class="ohaeng-count">{{WATER_COUNT}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ 본질 카드 -->
+      <div class="card">
+        <div class="card-label">본질을 한 마디로</div>
+        <div class="essence-headline">{{ESSENCE_HEADLINE}}</div>
+        <div class="essence-item"><span class="essence-dot">◆</span><span>{{ESSENCE_1}}</span></div>
+        <div class="essence-item"><span class="essence-dot">◆</span><span>{{ESSENCE_2}}</span></div>
+        <div class="essence-item"><span class="essence-dot">◆</span><span>{{ESSENCE_3}}</span></div>
+      </div>
+
+    </div>
+
+    <!-- ✅ 키워드 태그 6개 -->
+    <div class="keyword-section">
+      <div class="section-title">나를 상징하는 키워드</div>
+      <div class="keyword-tags">
+        <div class="keyword-tag">{{KEYWORD_1}}</div>
+        <div class="keyword-tag">{{KEYWORD_2}}</div>
+        <div class="keyword-tag">{{KEYWORD_3}}</div>
+        <div class="keyword-tag">{{KEYWORD_4}}</div>
+        <div class="keyword-tag">{{KEYWORD_5}}</div>
+        <div class="keyword-tag">{{KEYWORD_6}}</div>
+      </div>
+    </div>
+
+    <!-- ✅ 4개 카드 -->
+    <div class="main-grid">
+      <div class="card">
+        <div class="main-card-title">☽ 성격 · 본질</div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{PERSONALITY_1}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{PERSONALITY_2}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{PERSONALITY_3}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{PERSONALITY_4}}</span></div>
+        <div class="card-footer-note">{{PERSONALITY_SUMMARY}}</div>
+      </div>
+      <div class="card">
+        <div class="main-card-title">✦ 재능 · 강점</div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{TALENT_1}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{TALENT_2}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{TALENT_3}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{TALENT_4}}</span></div>
+        <div class="card-footer-note">{{TALENT_SUMMARY}}</div>
+      </div>
+      <div class="card">
+        <div class="main-card-title">⚠ 과제 · 주의점</div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{CAUTION_1}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{CAUTION_2}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{CAUTION_3}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{CAUTION_4}}</span></div>
+        <div class="card-footer-note">{{CAUTION_SUMMARY}}</div>
+      </div>
+      <div class="card">
+        <div class="main-card-title">🌙 지금 당신에게</div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{NOW_1}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{NOW_2}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{NOW_3}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">◆</span><span>{{NOW_4}}</span></div>
+        <div class="card-footer-note">{{NOW_SUMMARY}}</div>
+      </div>
+    </div>
+
+    <!-- ✅ 직업·연애 카드 -->
+    <div class="bottom-grid">
+      <div class="card">
+        <div class="bottom-card-title"><span>💼</span> 직업 · 재물운</div>
+        <div class="work-item"><div class="work-item-label">적합한 직종</div><div class="work-item-value">{{WORK_JOBS}}</div></div>
+        <div class="work-item"><div class="work-item-label">재물 패턴</div><div class="work-item-value">{{WORK_MONEY}}</div></div>
+        <div class="work-item"><div class="work-item-label">주의할 점</div><div class="work-item-value">{{WORK_CAUTION}}</div></div>
+        <div class="work-item"><div class="work-item-label">재물 키우는 법</div><div class="work-item-value">{{WORK_GROWTH}}</div></div>
+        <div class="card-footer-note">{{WORK_SUMMARY}}</div>
+      </div>
+      <div class="card">
+        <div class="bottom-card-title"><span>🤍</span> 연애 · 인연운</div>
+        <div class="bullet-item"><span class="bullet-dot">♡</span><span>{{LOVE_1}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">♡</span><span>{{LOVE_2}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">♡</span><span>{{LOVE_3}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">♡</span><span>{{LOVE_4}}</span></div>
+        <div class="bullet-item"><span class="bullet-dot">♡</span><span>{{LOVE_5}}</span></div>
+        <div class="card-footer-note">{{LOVE_SUMMARY}}</div>
+      </div>
+    </div>
+
+    <!-- ✅ 대운 5개 -->
+    <div class="daewoon-section">
+      <div class="section-title">대운의 흐름 (10년 주기)</div>
+      <div class="flow-grid">
+        <div class="flow-item">
+          <div class="flow-age">{{DW1_AGE}}</div>
+          <div class="flow-icon-wrap"><span class="flow-icon">🌱</span></div>
+          <div class="flow-name">{{DW1_NAME}}</div>
+          <div style="font-size:9px;color:var(--muted);">{{DW1_PHASE}}</div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-age">{{DW2_AGE}}</div>
+          <div class="flow-icon-wrap"><span class="flow-icon">📖</span></div>
+          <div class="flow-name">{{DW2_NAME}}</div>
+          <div style="font-size:9px;color:var(--muted);">{{DW2_PHASE}}</div>
+        </div>
+        <div class="flow-item current">
+          <div class="flow-age">{{DW3_AGE}}</div>
+          <div class="flow-icon-wrap">
+            <span class="flow-icon">🔥</span>
+            <div class="flow-name">{{DW3_NAME}}</div>
+            <div class="flow-badge">진행중</div>
+          </div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-age">{{DW4_AGE}}</div>
+          <div class="flow-icon-wrap"><span class="flow-icon">📈</span></div>
+          <div class="flow-name">{{DW4_NAME}}</div>
+          <div style="font-size:9px;color:var(--muted);">{{DW4_PHASE}}</div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-age">{{DW5_AGE}}</div>
+          <div class="flow-icon-wrap"><span class="flow-icon">👑</span></div>
+          <div class="flow-name">{{DW5_NAME}}</div>
+          <div style="font-size:9px;color:var(--muted);">{{DW5_PHASE}}</div>
+        </div>
+      </div>
+      <div class="flow-desc">{{DAEWOON_SUMMARY}}</div>
+    </div>
+
+    <!-- ✅ 마지막 메시지 -->
+    <div class="message-card">
+      <div class="msg-ornament">
+        <div class="msg-ornament-line"></div>
+        <div class="message-title-gem"></div>
+        <div class="message-title">당신의 사주가 전하는 말</div>
+        <div class="message-title-gem"></div>
+        <div class="msg-ornament-line"></div>
+      </div>
+      <div class="message-text">{{MESSAGE}}</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
+`;
+}
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`서버 실행중 : ${PORT}`));
